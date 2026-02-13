@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>For my love 💖</title>
+
+<style>
+html, body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  background: linear-gradient(135deg, #ffb6c1, #ffc0cb);
+  font-family: "Comic Sans MS", cursive, sans-serif;
+}
+
+#hearts-container, #text-container {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+#text-container {
+  pointer-events: none;
+}
+
+.heart {
+  position: absolute;
+  animation: fall linear infinite;
+  opacity: 0.8;
+}
+
+@keyframes fall {
+  from { transform: translateY(-50px) rotate(0deg); }
+  to { transform: translateY(110vh) rotate(360deg); }
+}
+
+.fade-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #ff4d6d;
+  font-size: 28px;
+  text-align: center;
+  max-width: 90%;
+  line-height: 1.5;
+  opacity: 1;
+  transition: opacity 1s ease;
+}
+
+.vertical-text {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  color: #ff4d6d;
+  font-size: 28px;
+  opacity: 0;
+  transition: opacity 0.8s ease;
+  white-space: nowrap;
+}
+
+/* ✅ FIXED IVAN IMAGE */
+#ivan-img {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  max-width: 200px;
+  max-height: 80vh;
+  opacity: 0;            /* starts hidden */
+  transition: all 1s ease;
+  z-index: 2;            /* above hearts but below text */
+  object-fit: contain;    /* keep aspect ratio */
+}
+
+#ivan-img.shrunk {
+  top: 22%;
+  max-width: 100px;
+}
+
+.valentine-btn {
+  position: absolute;
+  padding: 12px 30px;
+  font-size: 22px;
+  font-weight: bold;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  color: #fff;
+  background-color: #ff4d6d;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+  opacity: 0;
+  transform: translateY(-20px);
+  transition: all 0.8s ease;
+}
+
+.red-btn {
+  position: absolute;
+  padding: 20px 40px;
+  font-size: 28px;
+  font-weight: bold;
+  border: none;
+  border-radius: 14px;
+  cursor: pointer;
+  color: #fff;
+  background-color: #d50000;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+  opacity: 0;
+  transition: all 1s ease;
+}
+
+.red-btn-text {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  color: #d50000;
+  font-size: 22px;
+  opacity: 0;
+  transition: all 1s ease;
+  text-align: center;
+}
+
+.big-image {
+  position: absolute;
+  top: 50%;
+  left: -100%;
+  transform: translateY(-50%);
+  max-width: 90vw;
+  transition: left 1s linear;
+}
+</style>
+</head>
+
+<body>
+
+<!-- MUSIC (Add your MP3 here) -->
+<audio id="bg-music" loop>
+  <source src="romantic.mp3" type="audio/mpeg">
+</audio>
+
+<div id="hearts-container"></div>
+<div id="text-container"></div>
+
+<!-- IVAN IMAGE -->
+<img id="ivan-img" src="https://i.postimg.cc/vT63bpBx/Screenshot-2026-02-13-00-01-20-004-com-google-android-googlequicksearchbox-edit.jpg" alt="Ivan">
+
+<script>
+/* ================= HEARTS ================= */
+const hearts = ["💖","💘","💝","💗"];
+const hc = document.getElementById("hearts-container");
+
+setInterval(() => {
+  const h = document.createElement("div");
+  h.className = "heart";
+  h.textContent = hearts[Math.floor(Math.random()*hearts.length)];
+  h.style.left = Math.random()*100 + "vw";
+  h.style.fontSize = 20 + Math.random()*20 + "px";
+  h.style.animationDuration = 4 + Math.random()*3 + "s";
+  hc.appendChild(h);
+  setTimeout(() => h.remove(), 7000);
+}, 300);
+
+/* ================= HELPERS ================= */
+let typing = false;
+let clickLocked = false;
+
+function typeText(text, el, cb) {
+  typing = true;
+  clickLocked = true;
+  el.textContent = "";
+  let i = 0;
+  (function t(){
+    if(i < text.length){
+      el.textContent += text[i++];
+      setTimeout(t, 70);
+    } else {
+      typing = false;
+      clickLocked = false;
+      cb && cb();
+    }
+  })();
+}
+
+function fadeOut(el, cb) {
+  if(!el) return cb && cb();
+  el.style.opacity = 0;
+  setTimeout(()=>{ el.remove(); cb && cb(); }, 600);
+}
+
+/* ================= STORY ================= */
+const container = document.getElementById("text-container");
+let phase = "intro";
+let current;
+let finalText;
+
+/* Intro */
+const intro = [
+  "YAYYYY YOU CLICKED MEEE",
+  "Did you know that you'll always be the one for me?",
+  "I'll always pick you, no matter the distance or time ;)"
+];
+
+let introIndex = 0;
+function showIntro(){
+  current = document.createElement("div");
+  current.className = "fade-text";
+  container.appendChild(current);
+  typeText(intro[introIndex], current);
+}
+showIntro();
+
+/* ================= VERTICAL ================= */
+let verticalEls = [];
+const verticalTexts = [
+  "🔐❤️ Always in my heart",
+  "💭 Thinking of you",
+  "😢 Miss you so much",
+  "❤️‍🔥 You mean everything to me"
+];
+
+function showVertical(){
+  clickLocked = true;
+  let start = window.innerHeight * 0.3;
+  let gap = 110;
+  let done = 0;
+
+  verticalTexts.forEach((txt, idx) => {
+    const el = document.createElement("div");
+    el.className = "vertical-text";
+    el.textContent = txt;
+    el.style.top = start + idx * gap + "px";
+    container.appendChild(el);
+    verticalEls.push(el);
+
+    setTimeout(() => {
+      el.style.opacity = 1;
+      done++;
+      if(done === verticalTexts.length){
+        phase="vertical_ready";
+        clickLocked=false;
+      }
+    }, idx*900);
+  });
+}
+
+function fadeVertical(){
+  clickLocked = true;
+  verticalEls.forEach((el, idx)=>{
+    setTimeout(()=>{
+      el.style.opacity=0;
+      setTimeout(()=>el.remove(),500);
+    }, idx*300);
+  });
+  setTimeout(()=>{showSunshine(); clickLocked=false;}, verticalEls.length*300 + 600);
+}
+
+/* ================= SUNSHINE ================= */
+function showSunshine(){
+  phase="sunshine";
+  current=document.createElement("div");
+  current.className="fade-text";
+  container.appendChild(current);
+  typeText("Someone wants to meet you Sunshine.. ;)", current);
+}
+
+/* ================= IVAN ================= */
+const ivan = document.getElementById("ivan-img");
+
+function showIvanSequence(){
+  clickLocked = true;
+  ivan.style.opacity = 1;
+
+  setTimeout(()=>{
+    ivan.classList.add("shrunk");
+
+    const t1 = document.createElement("div");
+    const t2 = document.createElement("div");
+
+    [t1,t2].forEach(el=>{
+      el.style.position="absolute";
+      el.style.left="50%";
+      el.style.transform="translateX(-50%)";
+      el.style.color="#ff4d6d";
+      el.style.fontSize="26px";
+      el.style.opacity=0;
+      el.style.transition="opacity 1s ease";
+      document.body.appendChild(el);
+    });
+
+    t1.textContent="This is Ivan";
+    t2.textContent="And he wants to ask you a very important question..";
+    t1.style.top="42%";
+    t2.style.top="48%";
+
+    setTimeout(()=>{ t1.style.opacity=1; },500);
+    setTimeout(()=>{
+      t2.style.opacity=1;
+      clickLocked=false;
+      phase="ivan_done";
+    },2000);
+
+    window.ivanTexts=[t1,t2];
+
+  },1000);
+}
+
+/* ================= CLICK HANDLER ================= */
+document.body.addEventListener("click",()=>{
+  const music = document.getElementById("bg-music");
+  if(!music.paused){} else {music.play();}
+
+  if(typing || clickLocked) return;
+
+  if(phase==="intro"){
+    fadeOut(current, ()=>{
+      introIndex++;
+      if(introIndex<intro.length) showIntro();
+      else {phase="vertical"; showVertical();}
+    });
+  } else if(phase==="vertical_ready"){
+    phase="vertical_fade"; fadeVertical();
+  } else if(phase==="sunshine"){
+    fadeOut(current, showIvanSequence);
+  } else if(phase==="ivan_done"){
+    clickLocked=true;
+
+    if(window.ivanTexts){
+      window.ivanTexts.forEach(el=>{
+        el.style.opacity=0;
+        setTimeout(()=>el.remove(),600);
+      });
+    }
+
+    finalText=document.createElement("div");
+    finalText.className="fade-text";
+    container.appendChild(finalText);
+
+    typeText(
+      "Nastya.. Will you be my one and only special valentine this year?",
+      finalText,
+      ()=>{setTimeout(showValentineButtons,1000);}
+    );
+
+    clickLocked=false;
+    phase="final_text";
+  }
+});
+
+/* ================= VALENTINE BUTTONS ================= */
+function showValentineButtons(){
+  const btnYes=document.createElement("button");
+  btnYes.className="valentine-btn";
+  btnYes.textContent="YESSS :D";
+
+  const btnNo=document.createElement("button");
+  btnNo.className="valentine-btn";
+  btnNo.textContent="NO >:(";
+
+  document.body.appendChild(btnYes);
+  document.body.appendChild(btnNo);
+
+  const centerY=window.innerHeight*0.7;
+
+  btnYes.style.top=`${centerY}px`;
+  btnYes.style.left=`${window.innerWidth/2 - 160}px`;
+  btnNo.style.top=`${centerY}px`;
+  btnNo.style.left=`${window.innerWidth/2 + 40}px`;
+
+  btnYes.style.opacity=1;
+  btnNo.style.opacity=1;
+
+  const noTexts=[
+    "what why:(",
+    "really..?",
+    "I don't believe this :C",
+    "Nastya you don't wanna do this..",
+    "fine.. you leave me no other choice."
+  ];
+
+  let noIndex=0;
+  let currentNoText;
+
+  btnNo.addEventListener("click",()=>{
+    if(clickLocked) return;
+    if(noIndex < noTexts.length){
+      if(currentNoText) currentNoText.remove();
+      currentNoText = document.createElement("div");
+      currentNoText.className = "fade-text";
+      currentNoText.style.top = `${centerY+80}px`;
+      currentNoText.textContent = noTexts[noIndex++];
+      document.body.appendChild(currentNoText);
+    } else {
+      clickLocked = true;
+      if(btnYes) fadeOut(btnYes);
+      if(btnNo) fadeOut(btnNo);
+      if(currentNoText) fadeOut(currentNoText);
+      if(finalText){
+        fadeOut(finalText, ()=>{
+          showRedButton();
+          clickLocked = false;
+        });
+      } else {
+        showRedButton();
+        clickLocked = false;
+      }
+    }
+  });
+
+  /* ================= YES ending with typing ================= */
+  btnYes.addEventListener("click", () => {
+      btnYes.remove();
+      btnNo.remove();
+
+      // Remove Ivan image
+      ivan.remove();
+
+      // Fade out and remove the original question
+      if(finalText){
+          fadeOut(finalText);
+      }
+
+      // Step 1: YESSS I KNEWWW ITTTT with typing effect
+      const yesText = document.createElement("div");
+      yesText.className = "fade-text";
+      yesText.style.top = "50%";
+      yesText.style.left = "50%";
+      yesText.style.transform = "translate(-50%, -50%)";
+      container.appendChild(yesText);
+
+      typeText("YESSS I KNEWWW ITTTT", yesText, () => {
+          // After it's typed, user can click for final message
+          document.body.addEventListener("click", function showFinalMessage(e){
+              document.body.removeEventListener("click", showFinalMessage);
+
+              // Fade out YESSS text
+              fadeOut(yesText, () => {
+                  // Step 2: Final valentine message with typing effect
+                  const finalMessage = document.createElement("div");
+                  finalMessage.className = "fade-text";
+                  finalMessage.style.top = "50%";
+                  finalMessage.style.left = "50%";
+                  finalMessage.style.transform = "translate(-50%, -50%)";
+                  finalMessage.style.fontSize = "28px";
+                  finalMessage.style.textAlign = "center";
+                  container.appendChild(finalMessage);
+
+                  typeText("Thanks for being my valentine this year, I promise to always treat you with care and the purest form of love, because you deserve it my Sunshine :)", finalMessage);
+              });
+          });
+      });
+  });
+}
+
+/* ================= RED BUTTON ================= */
+function showRedButton(){
+  const redBtn=document.createElement("button");
+  redBtn.className="red-btn";
+  redBtn.textContent="CLICK ME";
+  document.body.appendChild(redBtn);
+  redBtn.style.top="50%";
+  redBtn.style.left="50%";
+  redBtn.style.transform="translate(-50%,-50%)";
+  redBtn.style.opacity=1;
+
+  const btnText=document.createElement("div");
+  btnText.className="red-btn-text";
+  btnText.textContent="definitely don't click this red button..";
+  btnText.style.top="60%";
+  btnText.style.opacity=1;
+  document.body.appendChild(btnText);
+
+  redBtn.addEventListener("click",()=>{
+    ivan.style.opacity=0;
+    setTimeout(()=>ivan.remove(),1000);
+    redBtn.remove();
+    btnText.remove();
+
+    setTimeout(()=>{
+      const larry=document.createElement("img");
+      larry.src="https://i.postimg.cc/SRxMVt1r/Screenshot-2026-01-28-23-15-24-130-com-discord-edit.jpg";
+      larry.className="big-image";
+      document.body.appendChild(larry);
+
+      setTimeout(()=>{
+        larry.style.left="50%";
+        larry.style.transform="translate(-50%,-50%)";
+      },50);
+
+      let threat = document.createElement("div");
+      threat.className="fade-text";
+      threat.textContent="you better agree to be his valentine. Or else...";
+      threat.style.top="20%";
+      threat.style.opacity=0;
+      document.body.appendChild(threat);
+
+      setTimeout(()=>{ threat.style.opacity=1; },50);
+
+      setTimeout(()=>{
+        const whyBtn = document.createElement("button");
+        whyBtn.className="valentine-btn";
+        whyBtn.textContent="but why..?";
+        document.body.appendChild(whyBtn);
+        whyBtn.style.top="65%";
+        whyBtn.style.left="50%";
+        whyBtn.style.transform="translateX(-50%)";
+        whyBtn.style.opacity=1;
+
+        whyBtn.addEventListener("click", ()=>{
+          fadeOut(threat);
+          fadeOut(whyBtn, ()=>{
+            const answer = document.createElement("div");
+            answer.className="fade-text";
+            answer.textContent="because he loves you too much dummy:(";
+            answer.style.top="20%";
+            answer.style.opacity=0;
+            document.body.appendChild(answer);
+            setTimeout(()=>{ answer.style.opacity=1; },50);
+
+            const alrightBtn = document.createElement("button");
+            alrightBtn.className="valentine-btn";
+            alrightBtn.textContent="alright fine..";
+            document.body.appendChild(alrightBtn);
+            alrightBtn.style.top="75%";
+            alrightBtn.style.left="50%";
+            alrightBtn.style.transform="translateX(-50%)";
+            alrightBtn.style.opacity=1;
+
+            alrightBtn.addEventListener("click", ()=>{
+              fadeOut(answer);
+
+              larry.style.transition = "left 1s linear";
+              larry.style.left = "-120%";
+
+              setTimeout(()=>{
+                larry.remove();
+                alrightBtn.remove();
+
+                document.body.appendChild(ivan);
+                ivan.style.opacity = 1;
+
+                finalText=document.createElement("div");
+                finalText.className = "fade-text";
+                container.appendChild(finalText);
+
+                typeText(
+                  "Nastya.. Will you be my one and only special valentine this year?",
+                  finalText,
+                  ()=>{setTimeout(showValentineButtons,500);}
+                );
+
+              }, 1100);
+            });
+          });
+        });
+      },1000);
+    },1000);
+  });
+}
+</script>
+
+</body>
+</html>
